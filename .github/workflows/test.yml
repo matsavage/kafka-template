@@ -1,0 +1,42 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and start devcontainer
+        uses: devcontainers/ci@v0.3
+        with:
+          imageName: ghcr.io/${{ github.repository }}/kafka-devcontainer
+          push: never
+          runCmd: |
+            # Install additional test dependencies
+            pip install pytest-cov pytest-kafka testcontainers
+            
+            # Run the tests with coverage
+            python -m pytest --cov=kafka_protobuf tests/ --cov-report=xml --cov-report=term
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+      - name: Annotate test failures
+        if: failure()
+        uses: mikepenz/action-junit-report@v3
+        with:
+          report_paths: 'test-reports/*.xml'
+          github_token: ${{ secrets.GITHUB_TOKEN }}

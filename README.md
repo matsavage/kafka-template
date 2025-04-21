@@ -1,5 +1,9 @@
 # Kafka Python Development Environment
 
+[![Tests](https://github.com/yourusername/kafka/actions/workflows/test.yml/badge.svg)](https://github.com/yourusername/kafka/actions/workflows/test.yml)
+[![Coverage](https://codecov.io/gh/yourusername/kafka/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/kafka)
+[![Lint](https://github.com/yourusername/kafka/actions/workflows/lint.yml/badge.svg)](https://github.com/yourusername/kafka/actions/workflows/lint.yml)
+
 This repository contains a development environment for working with Apache Kafka using Python, with Protobuf serialization and Schema Registry integration.
 
 ## Setup
@@ -24,6 +28,7 @@ The development environment includes:
 
 ```
 ├── .devcontainer/      # Dev container configuration
+├── .github/            # GitHub Actions workflows
 ├── build/              # Directory for compiled protobuf files (gitignored)
 ├── examples/           # Example scripts
 ├── kafka_protobuf/     # Python package
@@ -102,6 +107,9 @@ make test-verbose
 
 # Run a specific test file
 make test-file file=tests/test_protobuf_messaging.py
+
+# Run tests with coverage
+python -m pytest --cov=kafka_protobuf tests/
 ```
 
 The test suite includes:
@@ -109,6 +117,14 @@ The test suite includes:
 - Integration tests for sending and receiving Protobuf messages
 - Tests for schema registration and management
 - Fixtures that automate schema cleanup after tests
+
+## CI/CD Pipeline
+
+This project uses GitHub Actions for continuous integration and delivery:
+
+- **Tests**: Runs all tests in the devcontainer environment
+- **Coverage**: Generates and reports code coverage
+- **Lint**: Enforces code style using Black, Flake8, and isort
 
 ## Environment Variables
 

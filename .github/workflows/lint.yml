@@ -1,0 +1,38 @@
+name: Lint
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and start devcontainer
+        uses: devcontainers/ci@v0.3
+        with:
+          imageName: ghcr.io/${{ github.repository }}/kafka-devcontainer
+          push: never
+          runCmd: |
+            # Install linting tools
+            pip install black flake8 isort
+
+            # Run linters
+            python -m black --check kafka_protobuf tests
+            python -m flake8 kafka_protobuf tests
+            python -m isort --check-only --profile black kafka_protobuf tests
+
+      - name: Annotate linting issues
+        if: failure()
+        uses: reviewdog/action-flake8@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review

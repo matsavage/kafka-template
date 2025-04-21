@@ -27,6 +27,8 @@ testcontainers = "^3.7.1"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
+junit_family = "xunit2"
+addopts = "--junitxml=test-reports/junit.xml"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
