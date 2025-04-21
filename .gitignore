@@ -36,3 +36,9 @@ logs/
 
 # Environment variables
 .env
+
+# Poetry
+poetry.lock
+
+# Generated protobuf files
+build/

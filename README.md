@@ -1,6 +1,6 @@
 # Kafka Python Development Environment
 
-This repository contains a development environment for working with Apache Kafka using Python.
+This repository contains a development environment for working with Apache Kafka using Python, with Protobuf serialization and Schema Registry integration.
 
 ## Setup
 
@@ -14,17 +14,103 @@ This repository contains a development environment for working with Apache Kafka
 
 The development environment includes:
 
-- Python 3.10
-- Kafka broker (using the official Confluent Kafka image)
+- Python 3.10 with Poetry for dependency management
+- Kafka broker (using the Confluent Kafka image)
 - Zookeeper (required for Kafka)
-- Python packages for working with Kafka
+- Schema Registry with Protobuf support
+- Protobuf compiler
 
-## Usage
+## Directory Structure
 
-After the container is built and started, you can interact with Kafka using the `kafka-python` library.
+```
+├── .devcontainer/      # Dev container configuration
+├── build/              # Directory for compiled protobuf files (gitignored)
+├── examples/           # Example scripts
+├── kafka_protobuf/     # Python package
+├── protos/             # Protobuf schema definitions
+├── tests/              # Unit and integration tests
+├── Makefile            # Commands for compiling protos and running tests
+├── pyproject.toml      # Poetry configuration
+└── README.md           # This file
+```
 
-Example code for a producer and consumer can be found in the `examples` directory.
+## Working with Protobuf
+
+### Compiling Protobuf Schemas
+
+Protobuf schema files (`.proto`) are stored in the `protos/` directory. To compile them:
+
+```bash
+make compile-protos
+```
+
+This will generate Python modules in the `build/` directory.
+
+### Using the Package
+
+The `kafka_protobuf` package contains utilities for working with Kafka and Protobuf:
+
+- `utils.py`: Utilities for compiling protos and managing paths
+- `messages.py`: Helpers for creating and sending Protobuf messages
+
+Example usage:
+
+```python
+from kafka_protobuf.messages import get_producer, create_user, send_user
+
+# Get a producer configured for Protobuf
+producer = get_producer()
+
+# Create a user message
+user = create_user(1, "Alice Smith", "alice@example.com")
+
+# Send the user message
+send_user(producer, "users-topic", user)
+```
+
+### Example Scripts
+
+The `examples/` directory contains ready-to-use scripts:
+
+- `protobuf_producer.py`: Sends messages using Protobuf serialization
+- `protobuf_consumer.py`: Receives and deserializes Protobuf messages
+
+Both examples automatically compile the proto files if needed.
+
+## Running Examples
+
+```bash
+# Start a consumer in one terminal
+python examples/protobuf_consumer.py
+
+# Start a producer in another terminal
+python examples/protobuf_producer.py
+```
+
+## Testing
+
+The project includes integration tests that require the Kafka and Schema Registry services to be running. The tests are set up to connect to these services through the Docker Compose network.
+
+To run tests:
+
+```bash
+# Run all tests
+make test
+
+# Run tests with verbose output
+make test-verbose
+
+# Run a specific test file
+make test-file file=tests/test_protobuf_messaging.py
+```
+
+The test suite includes:
+
+- Integration tests for sending and receiving Protobuf messages
+- Tests for schema registration and management
+- Fixtures that automate schema cleanup after tests
 
 ## Environment Variables
 
 - `KAFKA_BOOTSTRAP_SERVER`: The Kafka broker address (default: `kafka:9092`)
+- `SCHEMA_REGISTRY_URL`: The Schema Registry URL (default: `http://schema-registry:8081`)
