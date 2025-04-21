@@ -36,7 +36,7 @@ jobs:
 
       - name: Annotate test failures
         if: failure()
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@v5
         with:
           report_paths: 'test-reports/*.xml'
           github_token: ${{ secrets.GITHUB_TOKEN }}
